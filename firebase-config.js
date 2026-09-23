@@ -1,5 +1,5 @@
 const firebaseConfig = {
-  apiKey: "AIzaSyA3RJ7-Czo03NVpoLB_H4_kE4y2UANnV8",
+  apiKey: "AIzaSyA3RJ7-Czo03NVpoLB_H4K_eU4y2UANnV8",
   authDomain: "nice-cosmic.firebaseapp.com",
   databaseURL: "https://nice-cosmic-default-rtdb.firebaseio.com",
   projectId: "nice-cosmic",
