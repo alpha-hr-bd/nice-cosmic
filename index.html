@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Nice Cosmic Shop</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
+</head>
+
+<body>
+
+<header class="topbar">
+  <div>
+    <h1>Nice Cosmic Shop 🚀</h1>
+    <p>Smart Shop Management System</p>
+  </div>
+
+  <button id="logoutBtn" class="logout hidden">Logout</button>
+</header>
+
+<main>
+
+  <!-- LOGIN -->
+  <section id="loginSection" class="card login-card">
+
+    <h2>🔐 Admin Login</h2>
+
+    <form id="loginForm">
+
+      <input
+        id="loginEmail"
+        type="email"
+        placeholder="Admin Email"
+        required
+      >
+
+      <input
+        id="loginPassword"
+        type="password"
+        placeholder="Password"
+        required
+      >
+
+      <button class="primary">
+        Login
+      </button>
+
+    </form>
+
+    <p id="loginError"></p>
+
+  </section>
+
+
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="hidden">
+
+    <!-- STATS -->
+
+    <div class="stats">
+
+      <div class="stat">
+        <span>Products</span>
+        <strong id="totalProducts">0</strong>
+      </div>
+
+      <div class="stat">
+        <span>Total Stock</span>
+        <strong id="totalStock">0</strong>
+      </div>
+
+      <div class="stat">
+        <span>Total Revenue</span>
+        <strong id="totalRevenue">৳0</strong>
+      </div>
+
+      <div class="stat">
+        <span>Net Profit</span>
+        <strong id="totalProfit">৳0</strong>
+      </div>
+
+    </div>
+
+
+    <div class="grid">
+
+
+      <!-- ADD PRODUCT -->
+
+      <section class="card">
+
+        <h2>📦 Add Product</h2>
+
+        <form id="productForm">
+
+          <input
+            id="productName"
+            placeholder="Product name"
+            required
+          >
+
+          <input
+            id="productQty"
+            type="number"
+            min="0"
+            placeholder="Stock quantity"
+            required
+          >
+
+          <input
+            id="buyPrice"
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="Buy price"
+            required
+          >
+
+          <input
+            id="sellPrice"
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="Sell price"
+            required
+          >
+
+          <div class="two">
+
+            <input
+              id="minSellPrice"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="Minimum sell"
+            >
+
+            <input
+              id="maxSellPrice"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="Maximum sell"
+            >
+
+          </div>
+
+          <button class="primary">
+            Add Product
+          </button>
+
+        </form>
+
+      </section>
+
+
+
+      <!-- SALE -->
+
+      <section class="card">
+
+        <h2>💰 Record Sale</h2>
+
+        <form id="saleForm">
+
+          <select id="saleProduct" required>
+
+            <option value="">
+              Select Product
+            </option>
+
+          </select>
+
+          <input
+            id="saleQty"
+            type="number"
+            min="1"
+            placeholder="Sale quantity"
+            required
+          >
+
+          <input
+            id="actualSellPrice"
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="Actual sell price"
+            required
+          >
+
+          <div id="saleInfo" class="info">
+            Select a product
+          </div>
+
+          <button class="primary">
+            Complete Sale
+          </button>
+
+        </form>
+
+      </section>
+
+
+
+      <!-- EXPENSE -->
+
+      <section class="card">
+
+        <h2>💸 Add Expense</h2>
+
+        <form id="expenseForm">
+
+          <input
+            id="expenseTitle"
+            placeholder="Expense title"
+            required
+          >
+
+          <input
+            id="expenseAmount"
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="Amount"
+            required
+          >
+
+          <button class="primary">
+            Save Expense
+          </button>
+
+        </form>
+
+      </section>
+
+
+
+      <!-- REPORT -->
+
+      <section class="card">
+
+        <h2>📊 Reports</h2>
+
+        <div class="report-buttons">
+
+          <button onclick="generateReport('today')">
+            Today
+          </button>
+
+          <button onclick="generateReport('month')">
+            This Month
+          </button>
+
+          <button onclick="generateReport('year')">
+            This Year
+          </button>
+
+          <button onclick="generateReport('all')">
+            All Time
+          </button>
+
+        </div>
+
+        <div id="reportBox" class="report-box">
+          Select a report
+        </div>
+
+        <button
+          class="primary"
+          onclick="printReport()"
+        >
+          📄 Download / Save PDF
+        </button>
+
+      </section>
+
+    </div>
+
+
+
+    <!-- PRODUCTS -->
+
+    <section class="card">
+
+      <div class="section-title">
+
+        <h2>📦 Products</h2>
+
+        <input
+          id="searchProduct"
+          placeholder="Search..."
+        >
+
+      </div>
+
+      <div class="table-wrapper">
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>Product</th>
+              <th>Stock</th>
+              <th>Buy</th>
+              <th>Sell</th>
+              <th>Min</th>
+              <th>Max</th>
+              <th>Action</th>
+
+            </tr>
+
+          </thead>
+
+          <tbody id="productTable"></tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- SALES -->
+
+    <section class="card">
+
+      <h2>🧾 Recent Sales</h2>
+
+      <div class="table-wrapper">
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>Date</th>
+              <th>Product</th>
+              <th>Qty</th>
+              <th>Revenue</th>
+              <th>Profit</th>
+
+            </tr>
+
+          </thead>
+
+          <tbody id="salesTable"></tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+  </section>
+
+</main>
+
+
+<div id="toast"></div>
+
+
+<script src="firebase-config.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
